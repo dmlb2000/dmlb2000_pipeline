@@ -1,13 +1,13 @@
 ---
 driver:
   name: vagrant
+  provider: libvirt
 
 provisioner:
-  name: chef_zero
+  name: chef_solo
 
 platforms:
-  - name: ubuntu-14.04
-  - name: centos-7.1
+  - name: ubuntu-14.10
 
 suites:
   - name: default

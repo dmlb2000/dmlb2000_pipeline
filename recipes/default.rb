@@ -7,7 +7,7 @@
 include_recipe 'git'
 
 git "#{Chef::Config[:file_cache_path]}/chef-repo" do
-  repository "https://github.com/dmlb2000/chef-repo.git"
+  repository 'https://github.com/dmlb2000/chef-repo.git'
   action :sync
   notifies :run, 'bash[chef-repo-check]'
 end
@@ -26,8 +26,8 @@ bash 'chef-repo-check' do
 end
 
 %w(
-dmlb2000_distro
-dmlb2000_chefbits
+  dmlb2000_distro
+  dmlb2000_chefbits
 ).each do |repo|
   git "#{Chef::Config[:file_cache_path]}/#{repo}" do
     repository "https://github.com/dmlb2000/#{repo}.git"
@@ -47,12 +47,12 @@ dmlb2000_chefbits
 end
 
 git "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline" do
-  repository "https://github.com/dmlb2000/dmlb2000_pipeline.git"
+  repository 'https://github.com/dmlb2000/dmlb2000_pipeline.git'
   action :sync
-  notifies :run, "bash[pipeline-checkit]"
+  notifies :run, 'bash[pipeline-checkit]'
 end
 
-bash "pipeline-checkit" do
+bash 'pipeline-checkit' do
   cwd "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline"
   code <<-EOH
     set -xe
@@ -60,5 +60,4 @@ bash "pipeline-checkit" do
     rubocop
   EOH
   action :nothing
-end
 end

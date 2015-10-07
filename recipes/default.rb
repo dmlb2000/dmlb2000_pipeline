@@ -61,3 +61,17 @@ bash 'pipeline-checkit' do
   EOH
   action :nothing
 end
+
+%w(
+  dmlb2000_distro
+  dmlb2000_chefbits
+  dmlb2000_pipeline
+).each do |repo|
+  bash "#{repo}-upload" do
+    cwd "#{Chef::Config[:file_cache_path]}/#{repo}"
+    code <<-EOH
+      set -xe
+      berks upload
+    EOH
+  end
+end

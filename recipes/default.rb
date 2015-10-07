@@ -32,6 +32,13 @@ dmlb2000_chefbits
   git "#{Chef::Config[:file_cache_path]}/#{repo}" do
     repository "https://github.com/dmlb2000/#{repo}.git"
     action :sync
-    notifies :run, 'bash[checkit]'
+    notifies :run, "bash[#{repo}-checkit]"
+  end
+  bash "#{repo}-checkit" do
+    cwd "#{Chef::Config[:file_cache_path]}/#{repo}"
+    code <<-EOH
+      set -xe
+      foodcritic . -f correctness
+    EOH
   end
 end

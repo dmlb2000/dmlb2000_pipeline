@@ -39,6 +39,9 @@ dmlb2000_chefbits
     code <<-EOH
       set -xe
       foodcritic . -f correctness
+      rubocop
+      kitchen test
     EOH
   end
+  action :nothing
 end

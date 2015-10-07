@@ -42,6 +42,23 @@ dmlb2000_chefbits
       rubocop
       kitchen test
     EOH
+    action :nothing
   end
+end
+
+git "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline" do
+  repository "https://github.com/dmlb2000/dmlb2000_pipeline.git"
+  action :sync
+  notifies :run, "bash[pipeline-checkit]"
+end
+
+bash "pipeline-checkit" do
+  cwd "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline"
+  code <<-EOH
+    set -xe
+    foodcritic . -f correctness
+    rubocop
+  EOH
   action :nothing
+end
 end

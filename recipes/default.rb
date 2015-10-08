@@ -28,7 +28,7 @@ datestring = DateTime.now.to_s
 
 %w(
   dmlb2000_distro
-  dmlb2000_chefbits
+  dmlb2000_chef
 ).each do |repo|
   repodir = "#{Chef::Config[:file_cache_path]}/#{repo}"
   logdir = "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
@@ -142,7 +142,7 @@ end
 
 %w(
   dmlb2000_distro
-  dmlb2000_chefbits
+  dmlb2000_chef
   dmlb2000_pipeline
 ).each do |repo2|
   bash "#{repo2}-upload" do

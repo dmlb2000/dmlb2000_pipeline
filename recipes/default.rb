@@ -49,7 +49,7 @@ datestring = DateTime.now().to_s
 ) > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.log 2>&1
 rc=$?
 kitchen destroy
-if [[ $rc != 0 ]] ; then
+if [[ $rc == 0 ]] ; then
   echo Success > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.success
 else
   echo Failure > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.failure
@@ -94,7 +94,7 @@ bash 'pipeline-checkit' do
   rubocop
 ) > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.log 2>&1
 rc=$?
-if [[ $rc != 0 ]] ; then
+if [[ $rc == 0 ]] ; then
   echo Success > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.success
 else
   echo Failure > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.failure

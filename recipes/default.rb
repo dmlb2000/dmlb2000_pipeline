@@ -47,6 +47,7 @@ datestring = DateTime.now.to_s
   set -xe
   foodcritic . -f correctness
   rubocop
+  berks install
   kitchen test
 ) > #{logdir}/#{datestring}.log 2>&1
 rc=$?
@@ -104,6 +105,7 @@ bash "#{repo}-checkit" do
   set -xe
   foodcritic . -f correctness
   rubocop
+  berks install
 ) > #{logdir}/#{datestring}.log 2>&1
 rc=$?
 if [[ $rc == 0 ]] ; then

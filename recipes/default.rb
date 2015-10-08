@@ -81,7 +81,7 @@ end
 git "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline" do
   repository 'https://github.com/dmlb2000/dmlb2000_pipeline.git'
   action :sync
-  notifies :run, 'bash[pipeline-checkit]'
+  notifies :run, 'bash[pipeline-checkit]', :immediately
 end
 
 directory "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs"

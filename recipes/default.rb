@@ -41,37 +41,37 @@ datestring = DateTime.now().to_s
   bash "#{repo}-checkit" do
     cwd "#{Chef::Config[:file_cache_path]}/#{repo}"
     code <<-EOH
-      (
-      set -xe
-      foodcritic . -f correctness
-      rubocop
-      kitchen test
-      ) > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.log 2>&1
-      rc=$?
-      kitchen destroy
-      if [[ $rc != 0 ]] ; then
-        echo Success > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.success
-      else
-        echo Failure > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.failure
-      fi
+(
+  set -xe
+  foodcritic . -f correctness
+  rubocop
+  kitchen test
+) > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.log 2>&1
+rc=$?
+kitchen destroy
+if [[ $rc != 0 ]] ; then
+  echo Success > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.success
+else
+  echo Failure > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.failure
+fi
     EOH
     action :nothing
   end
   bash "#{repo}-failure" do
     cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
     code <<-EOH
-      mail -s "[chef-pipeline] #{repo} failed" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
-      Chef pipeline failed to run, check logs attached.
-      EOF
+mail -s "[chef-pipeline] #{repo} failed" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
+Chef pipeline failed to run, check logs attached.
+EOF
     EOH
     only_if do ::File.exists?("#{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.failure") end
   end
   bash "#{repo}-success" do
     cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
     code <<-EOH
-      mail -s "[chef-pipeline] #{repo} success" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
-      Chef pipeline succeded and was uploaded.
-      EOF
+mail -s "[chef-pipeline] #{repo} success" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
+Chef pipeline succeded and was uploaded.
+EOF
     EOH
     only_if do ::File.exists?("#{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.success") end
     notifies :run, "bash[#{repo}-upload]"
@@ -88,17 +88,17 @@ directory "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs"
 bash 'pipeline-checkit' do
   cwd "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline"
   code <<-EOH
-    (
-    set -xe
-    foodcritic . -f correctness
-    rubocop
-    ) > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.log 2>&1
-    rc=$?
-    if [[ $rc != 0 ]] ; then
-      echo Success > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.success
-    else
-      echo Failure > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.failure
-    fi
+(
+  set -xe
+  foodcritic . -f correctness
+  rubocop
+) > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.log 2>&1
+rc=$?
+if [[ $rc != 0 ]] ; then
+  echo Success > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.success
+else
+  echo Failure > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.failure
+fi
   EOH
   action :nothing
 end
@@ -106,18 +106,18 @@ repo = "dmlb2000_pipeline"
 bash "#{repo}-failure" do
   cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
   code <<-EOH
-    mail -s "[chef-pipeline] #{repo} failed" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
-    Chef pipeline failed to run, check logs attached.
-    EOF
+mail -s "[chef-pipeline] #{repo} failed" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
+Chef pipeline failed to run, check logs attached.
+EOF
   EOH
   only_if do ::File.exists?("#{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.failure") end
 end
 bash "#{repo}-success" do
   cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
   code <<-EOH
-    mail -s "[chef-pipeline] #{repo} success" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
-    Chef pipeline succeded and was uploaded.
-    EOF
+mail -s "[chef-pipeline] #{repo} success" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
+Chef pipeline succeded and was uploaded.
+EOF
   EOH
   only_if do ::File.exists?("#{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.success") end
   notifies :run, "bash[#{repo}-upload]"
@@ -131,8 +131,8 @@ end
   bash "#{repo}-upload" do
     cwd "#{Chef::Config[:file_cache_path]}/#{repo}"
     code <<-EOH
-      set -xe
-      berks upload
+set -xe
+berks upload
     EOH
     action :nothing
   end

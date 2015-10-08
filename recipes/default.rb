@@ -26,100 +26,117 @@ bash 'chef-repo-check' do
 end
 
 require 'date'
-datestring = DateTime.now().to_s
+datestring = DateTime.now.to_s
 
 %w(
   dmlb2000_distro
   dmlb2000_chefbits
 ).each do |repo|
-  git "#{Chef::Config[:file_cache_path]}/#{repo}" do
+  repodir = "#{Chef::Config[:file_cache_path]}/#{repo}"
+  logdir = "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
+  git repodir do
     repository "https://github.com/dmlb2000/#{repo}.git"
     action :sync
     notifies :run, "bash[#{repo}-checkit]", :immediately
   end
-  directory "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
+  directory logdir
   bash "#{repo}-checkit" do
-    cwd "#{Chef::Config[:file_cache_path]}/#{repo}"
+    cwd repodir
     code <<-EOH
 (
   set -xe
   foodcritic . -f correctness
   rubocop
   kitchen test
-) > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.log 2>&1
+) > #{logdir}/#{datestring}.log 2>&1
 rc=$?
 kitchen destroy
 if [[ $rc == 0 ]] ; then
-  echo Success > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.success
+  echo Success > #{logdir}/#{datestring}.success
 else
-  echo Failure > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.failure
+  echo Failure > #{logdir}/#{datestring}.failure
 fi
     EOH
     action :nothing
   end
   bash "#{repo}-failure" do
-    cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
+    cwd logdir
     code <<-EOH
-mail -s "[chef-pipeline] #{repo} failed" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" "dmlb2000@gmail.com" <<EOF
+mail -s "[chef-pipeline] #{repo} failed" \
+     -a #{datestring}.log \
+     -r "dmlb2000@dmlb2000.org" \
+     "dmlb2000@gmail.com" <<EOF
 Chef pipeline failed to run, check logs attached.
 EOF
     EOH
-    only_if do ::File.exists?("#{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.failure") end
+    only_if { ::File.exist?("#{logdir}/#{datestring}.failure") }
   end
   bash "#{repo}-success" do
-    cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
+    cwd logdir
     code <<-EOH
-mail -s "[chef-pipeline] #{repo} success" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" "dmlb2000@gmail.com" <<EOF
+mail -s "[chef-pipeline] #{repo} success" \
+     -a #{datestring}.log \
+     -r "dmlb2000@dmlb2000.org" \
+     "dmlb2000@gmail.com" <<EOF
 Chef pipeline succeded and was uploaded.
 EOF
     EOH
-    only_if do ::File.exists?("#{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.success") end
+    only_if { ::File.exist?("#{logdir}/#{datestring}.success") }
     notifies :run, "bash[#{repo}-upload]"
   end
 end
 
-git "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline" do
-  repository 'https://github.com/dmlb2000/dmlb2000_pipeline.git'
+repo = 'dmlb2000_pipeline'
+repodir = "#{Chef::Config[:file_cache_path]}/#{repo}"
+logdir = "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
+
+git repodir do
+  repository "https://github.com/dmlb2000/#{repo}.git"
   action :sync
-  notifies :run, 'bash[pipeline-checkit]', :immediately
+  notifies :run, "bash[#{repo}-checkit]", :immediately
 end
 
-directory "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs"
-bash 'pipeline-checkit' do
-  cwd "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline"
+directory logdir
+bash "#{repo}-checkit" do
+  cwd repodir
   code <<-EOH
 (
   set -xe
   foodcritic . -f correctness
   rubocop
-) > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.log 2>&1
+) > #{logdir}/#{datestring}.log 2>&1
 rc=$?
 if [[ $rc == 0 ]] ; then
-  echo Success > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.success
+  echo Success > #{logdir}/#{datestring}.success
 else
-  echo Failure > #{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs/#{datestring}.failure
+  echo Failure > #{logdir}/#{datestring}.failure
 fi
   EOH
   action :nothing
 end
-repo = "dmlb2000_pipeline"
 bash "#{repo}-failure" do
-  cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
+  cwd logdir
   code <<-EOH
-mail -s "[chef-pipeline] #{repo} failed" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" "dmlb2000@gmail.com" <<EOF
+mail -s "[chef-pipeline] #{repo} failed" \
+     -a #{datestring}.log \
+     -r "dmlb2000@dmlb2000.org" \
+     "dmlb2000@gmail.com" <<EOF
 Chef pipeline failed to run, check logs attached.
 EOF
   EOH
-  only_if do ::File.exists?("#{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.failure") end
+  only_if { ::File.exist?("#{logdir}/#{datestring}.failure") }
 end
 bash "#{repo}-success" do
-  cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
+  cwd logdir
   code <<-EOH
-mail -s "[chef-pipeline] #{repo} success" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" "dmlb2000@gmail.com" <<EOF
+mail -s "[chef-pipeline] #{repo} success" \
+     -a #{datestring}.log \
+     -r "dmlb2000@dmlb2000.org" \
+     "dmlb2000@gmail.com" <<EOF
 Chef pipeline succeded and was uploaded.
 EOF
   EOH
-  only_if do ::File.exists?("#{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.success") end
+  only_if { ::File.exist?("#{logdir}/#{datestring}.success") }
   notifies :run, "bash[#{repo}-upload]"
 end
 
@@ -127,9 +144,9 @@ end
   dmlb2000_distro
   dmlb2000_chefbits
   dmlb2000_pipeline
-).each do |repo|
-  bash "#{repo}-upload" do
-    cwd "#{Chef::Config[:file_cache_path]}/#{repo}"
+).each do |repo2|
+  bash "#{repo2}-upload" do
+    cwd "#{Chef::Config[:file_cache_path]}/#{repo2}"
     code <<-EOH
 set -xe
 berks upload

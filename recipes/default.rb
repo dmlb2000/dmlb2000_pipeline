@@ -60,7 +60,7 @@ fi
   bash "#{repo}-failure" do
     cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
     code <<-EOH
-mail -s "[chef-pipeline] #{repo} failed" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
+mail -s "[chef-pipeline] #{repo} failed" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" "dmlb2000@gmail.com" <<EOF
 Chef pipeline failed to run, check logs attached.
 EOF
     EOH
@@ -69,7 +69,7 @@ EOF
   bash "#{repo}-success" do
     cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
     code <<-EOH
-mail -s "[chef-pipeline] #{repo} success" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
+mail -s "[chef-pipeline] #{repo} success" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" "dmlb2000@gmail.com" <<EOF
 Chef pipeline succeded and was uploaded.
 EOF
     EOH
@@ -106,7 +106,7 @@ repo = "dmlb2000_pipeline"
 bash "#{repo}-failure" do
   cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
   code <<-EOH
-mail -s "[chef-pipeline] #{repo} failed" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
+mail -s "[chef-pipeline] #{repo} failed" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" "dmlb2000@gmail.com" <<EOF
 Chef pipeline failed to run, check logs attached.
 EOF
   EOH
@@ -115,7 +115,7 @@ end
 bash "#{repo}-success" do
   cwd "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
   code <<-EOH
-mail -s "[chef-pipeline] #{repo} success" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" <<EOF
+mail -s "[chef-pipeline] #{repo} success" -a #{datestring}.log -r "dmlb2000@dmlb2000.org" "dmlb2000@gmail.com" <<EOF
 Chef pipeline succeded and was uploaded.
 EOF
   EOH

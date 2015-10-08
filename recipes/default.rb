@@ -16,8 +16,6 @@ bash 'chef-repo-check' do
   cwd "#{Chef::Config[:file_cache_path]}/chef-repo"
   code <<-EOH
     set -xe
-    berks install
-    berks upload
     knife upload environments
     knife upload roles
     knife upload data bags
@@ -148,10 +146,11 @@ end
   dmlb2000_pipeline
 ).each do |repo2|
   bash "#{repo2}-upload" do
-    cwd "#{Chef::Config[:file_cache_path]}/#{repo2}"
+    cwd "#{Chef::Config[:file_cache_path]}/chef-repo"
     code <<-EOH
 set -xe
-berks upload
+berks install
+berks upload #{repo2}
     EOH
     action :nothing
   end

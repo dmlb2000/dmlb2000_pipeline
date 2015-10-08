@@ -32,12 +32,12 @@ datestring = DateTime.now.to_s
 ).each do |repo|
   repodir = "#{Chef::Config[:file_cache_path]}/#{repo}"
   logdir = "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
+  directory logdir
   git repodir do
     repository "https://github.com/dmlb2000/#{repo}.git"
     action :sync
     notifies :run, "bash[#{repo}-checkit]", :immediately
   end
-  directory logdir
   bash "#{repo}-checkit" do
     cwd repodir
     code <<-EOH
@@ -89,13 +89,13 @@ repo = 'dmlb2000_pipeline'
 repodir = "#{Chef::Config[:file_cache_path]}/#{repo}"
 logdir = "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
 
+directory logdir
 git repodir do
   repository "https://github.com/dmlb2000/#{repo}.git"
   action :sync
   notifies :run, "bash[#{repo}-checkit]", :immediately
 end
 
-directory logdir
 bash "#{repo}-checkit" do
   cwd repodir
   code <<-EOH

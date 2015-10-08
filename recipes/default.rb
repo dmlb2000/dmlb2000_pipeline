@@ -35,7 +35,7 @@ datestring = DateTime.now().to_s
   git "#{Chef::Config[:file_cache_path]}/#{repo}" do
     repository "https://github.com/dmlb2000/#{repo}.git"
     action :sync
-    notifies :run, "bash[#{repo}-checkit]"
+    notifies :run, "bash[#{repo}-checkit]", :immediately
   end
   directory "#{Chef::Config[:file_cache_path]}/#{repo}-logs"
   bash "#{repo}-checkit" do
@@ -48,8 +48,8 @@ datestring = DateTime.now().to_s
       kitchen test
       ) > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.log 2>&1
       rc=$?
+      kitchen destroy
       if [[ $rc != 0 ]] ; then
-        berks upload
         echo Success > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.success
       else
         echo Failure > #{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.failure
@@ -74,6 +74,7 @@ datestring = DateTime.now().to_s
       EOF
     EOH
     only_if do ::File.exists?("#{Chef::Config[:file_cache_path]}/#{repo}-logs/#{datestring}.success") end
+    notifies :run, "bash[#{repo}-upload]"
   end
 end
 
@@ -83,6 +84,7 @@ git "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline" do
   notifies :run, 'bash[pipeline-checkit]'
 end
 
+directory "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline-logs"
 bash 'pipeline-checkit' do
   cwd "#{Chef::Config[:file_cache_path]}/dmlb2000_pipeline"
   code <<-EOH
@@ -91,6 +93,7 @@ bash 'pipeline-checkit' do
     rubocop
   EOH
   action :nothing
+  notifies :run, 'bash[dmlb2000_pipeline-upload]'
 end
 
 %w(
@@ -104,5 +107,6 @@ end
       set -xe
       berks upload
     EOH
+    action :nothing
   end
 end

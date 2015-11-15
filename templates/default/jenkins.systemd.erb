@@ -1,0 +1,15 @@
+[Unit]
+Description=Jenkins Start Script
+After=syslog.target auditd.service network.target
+
+[Service]
+Type=simple
+WorkingDirectory=<%= node['jenkins']['master']['home'] %>
+User=<%= node['jenkins']['master']['user'] %>
+Environment=HOME=<%= node['jenkins']['master']['home'] %>
+ExecStart=/etc/alternatives/java -DJENKINS_HOME=<%= node['jenkins']['master']['home'] %> <%= node['jenkins']['master']['jvm_options'] %> -jar <%= node['jenkins']['master']['home'] %>/jenkins.war --httpPort=<%= node['jenkins']['master']['port'] %> --httpListenAddress=<%= node['jenkins']['master']['listen_address'] %> <%= node['jenkins']['master']['jenkins_args'] %>
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target

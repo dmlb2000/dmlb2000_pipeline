@@ -6,10 +6,8 @@
 
 include_recipe 'yum-centos'
 include_recipe 'yum-epel'
-include_recipe 'build-essential'
 include_recipe 'git'
-include_recipe 'chef-dk'
-include_recipe 'vagrant'
+include_recipe 'dmlb2000_chef'
 
 package 'python-pip'
 package 'python-virtualenv'

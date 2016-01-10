@@ -1,4 +1,4 @@
-include_recipe 'dmlb2000_buildbot::default'
+include_recipe 'dmlb2000_pipeline::default'
 
 bash "build_slave" do
   cwd '/var/lib/buildbot/slave'

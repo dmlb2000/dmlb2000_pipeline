@@ -14,10 +14,10 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[dmlb2000_buildbot::default]
+      - recipe[dmlb2000_pipeline::default]
     attributes:
   - name: aio
     run_list:
-      - recipe[dmlb2000_buildbot::master]
-      - recipe[dmlb2000_buildbot::slave]
+      - recipe[dmlb2000_pipeline::master]
+      - recipe[dmlb2000_pipeline::slave]
     attributes:

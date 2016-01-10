@@ -9,6 +9,7 @@ include_recipe 'yum-epel'
 include_recipe 'build-essential'
 include_recipe 'git'
 include_recipe 'chef-dk'
+include_recipe 'vagrant'
 
 package 'python-pip'
 package 'python-virtualenv'

@@ -16,8 +16,8 @@ c = BuildmasterConfig = {}
 # a BuildSlave object, specifying a unique slave name and password.  The same
 # slave name and password must be configured on the slave.
 c['slaves'] = []
-<%- node['dmlb2000_buildbot']['slaves'].each do |slave,password| %>
-c['slaves'].append(buildslave.BuildSlave("<%= slave %>", "<%= password %>"))
+<%- node['dmlb2000_pipeline']['all_slaves'].each do |slave,password| %>
+c['slaves'].append(buildslave.BuildSlave("<%= slave %>", "<%= password['password'] %>"))
 <%- end %>
 
 # 'protocols' contains information about protocols which master will use for
@@ -26,7 +26,7 @@ c['slaves'].append(buildslave.BuildSlave("<%= slave %>", "<%= password %>"))
 # with this protocol.
 # 'port' must match the value configured into the buildslaves (with their
 # --master option)
-c['protocols'] = {'pb': {'port': <%= node['dmlb2000_buildbot']['protocols']['port'] %>}}
+c['protocols'] = {'pb': {'port': <%= node['dmlb2000_pipeline']['protocols']['port'] %>}}
 
 ####### CHANGESOURCES
 
@@ -34,25 +34,30 @@ c['protocols'] = {'pb': {'port': <%= node['dmlb2000_buildbot']['protocols']['por
 # about source code changes.  Here we point to the buildbot clone of pyflakes.
 
 c['change_source'] = []
+<%- node['dmlb2000_pipeline']['cookbooks'].each do |cookbook| %>
 c['change_source'].append(changes.GitPoller(
-        'http://github.com/dmlb2000/dmlb2000_distro.git',
+        "http://github.com/dmlb2000/#{cookbook}.git",
         workdir='gitpoller-workdir', branch='master',
         pollinterval=300))
+<%- end %>
 
 ####### SCHEDULERS
 
 # Configure the Schedulers, which decide how to react to incoming changes.  In this
 # case, just kick off a 'runtests' build
 
+builderNames = []
+builderNames += <%= node['dmlb2000_pipeline']['cookbooks'].collect{|x| x+"_quick"}.to_s %>
+builderNames += <%= node['dmlb2000_pipeline']['cookbooks'].collect{|x| x+"_kitchen"}.to_s %>
 c['schedulers'] = []
 c['schedulers'].append(schedulers.SingleBranchScheduler(
                             name="all",
                             change_filter=util.ChangeFilter(branch='master'),
                             treeStableTimer=None,
-                            builderNames=["dmlb2000_distro_quick"]))
+                            builderNames=builderNames))
 c['schedulers'].append(schedulers.ForceScheduler(
                             name="force",
-                            builderNames=["dmlb2000_distro_quick"]))
+                            builderNames=builderNames))
 
 ####### BUILDERS
 
@@ -60,18 +65,28 @@ c['schedulers'].append(schedulers.ForceScheduler(
 # what steps, and which slaves can execute them.  Note that any particular build will
 # only take place on one slave.
 
+c['builders'] = []
+<%- node['dmlb2000_pipeline']['cookbooks'].each do |cookbook| %>
 factory = util.BuildFactory()
-# check out the source
-factory.addStep(steps.Git(repourl='http://github.com/dmlb2000/dmlb2000_distro.git', mode='incremental'))
-# run the tests (note that this will require that 'trial' is installed)
+
+factory.addStep(steps.Git(repourl="http://github.com/dmlb2000/<%=cookbook %>.git", mode='incremental'))
 factory.addStep(steps.ShellCommand(command=["rubocop", "."]))
 factory.addStep(steps.ShellCommand(command=["foodcritic", ".", "-f", "correctness"]))
 
-c['builders'] = []
 c['builders'].append(
-    util.BuilderConfig(name="dmlb2000_distro_quick",
-      slavenames=["example-slave"],
+    util.BuilderConfig(name="<%= cookbook %>_quick",
+      slavenames=["quick"],
       factory=factory))
+
+factory = util.BuildFactory()
+factory.addStep(steps.Git(repourl="http://github.com/dmlb2000/<%= cookbook %>.git", mode='incremental'))
+factory.addStep(steps.ShellCommand(command=["kitchen", "test"]))
+
+c['builders'].append(
+    util.BuilderConfig(name="<%=cookbook %>_kitchen",
+      slavenames=["kitchen"],
+      factory=factory))
+<%- end %>
 
 ####### STATUS TARGETS
 
@@ -96,7 +111,7 @@ authz_cfg=authz.Authz(
     stopAllBuilds = False,
     cancelPendingBuild = False,
 )
-c['status'].append(html.WebStatus(http_port=<%= node['dmlb2000_buildbot']['port'] %>, authz=authz_cfg))
+c['status'].append(html.WebStatus(http_port=<%= node['dmlb2000_pipeline']['port'] %>, authz=authz_cfg))
 
 ####### PROJECT IDENTITY
 
@@ -104,8 +119,8 @@ c['status'].append(html.WebStatus(http_port=<%= node['dmlb2000_buildbot']['port'
 # installation's html.WebStatus home page (linked to the
 # 'titleURL') and is embedded in the title of the waterfall HTML page.
 
-c['title'] = "Pyflakes"
-c['titleURL'] = "https://launchpad.net/pyflakes"
+c['title'] = "dmlb2000 Chef"
+c['titleURL'] = "https://www.dmlb2000.org"
 
 # the 'buildbotURL' string should point to the location where the buildbot's
 # internal web server (usually the html.WebStatus page) is visible. This
@@ -113,7 +128,7 @@ c['titleURL'] = "https://launchpad.net/pyflakes"
 # with an externally-visible host name which the buildbot cannot figure out
 # without some help.
 
-c['buildbotURL'] = "<%= node['dmlb2000_buildbot']['url'] %>"
+c['buildbotURL'] = "<%= node['dmlb2000_pipeline']['url'] %>"
 
 ####### DB URL
 

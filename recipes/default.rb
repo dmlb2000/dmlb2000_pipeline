@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: dmlb2000_buildbot
+# Cookbook Name:: dmlb2000_pipeline
 # Recipe:: default
 #
 # Copyright (c) 2016 The Authors, All Rights Reserved.
@@ -17,11 +17,11 @@ user 'buildbot' do
   home '/var/lib/buildbot'
 end
 
-%w{
-/var/lib/buildbot/virtualenv
-/var/lib/buildbot/master
-/var/lib/buildbot/slave
-}.each do |buildbot_dir|
+%w(
+  /var/lib/buildbot/virtualenv
+  /var/lib/buildbot/master
+  /var/lib/buildbot/slave
+).each do |buildbot_dir|
   directory buildbot_dir do
     owner 'buildbot'
     group 'buildbot'
@@ -41,4 +41,3 @@ end
 python_pip 'buildbot-slave' do
   virtualenv '/var/lib/buildbot/virtualenv'
 end
-

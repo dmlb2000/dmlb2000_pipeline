@@ -2,25 +2,22 @@
 driver:
   name: vagrant
   provider: libvirt
-  vagrantfiles:
-   - Vagrantfile.storage
+  customize:
+    volume_cache: "\'writeback\'"
 
 provisioner:
   name: chef_solo
 
 platforms:
-  - name: centos-7.1
+  - name: centos-7.2
 
 suites:
-  - name: database
-    run_list:
-      - recipe[dmlb2000_pipeline::database]
-  - name: gerrit
-    run_list:
-      - recipe[dmlb2000_pipeline::gerrit]
-  - name: jenkins
-    run_list:
-      - recipe[dmlb2000_pipeline::jenkins]
   - name: default
     run_list:
-      - recipe[dmlb2000_pipeline::default]
+      - recipe[dmlb2000_buildbot::default]
+    attributes:
+  - name: aio
+    run_list:
+      - recipe[dmlb2000_buildbot::master]
+      - recipe[dmlb2000_buildbot::slave]
+    attributes:

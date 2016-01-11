@@ -9,7 +9,14 @@ default['dmlb2000_pipeline']['port'] = '8080'
 default['dmlb2000_pipeline']['url'] = \
   "http://#{node['ipaddress']}:#{node['dmlb2000_pipeline']['port']}/"
 
-default['dmlb2000_pipeline']['cookbooks'] = ['dmlb2000_pipeline']
+if node['dmlb2000_pipeline']['in_kitchen']
+  default['dmlb2000_pipeline']['cookbooks'] = ['dmlb2000_chef']
+else
+  default['dmlb2000_pipeline']['cookbooks'] = %w(
+    dmlb2000_pipeline
+    dmlb2000_chef
+  )
+end
 
 default['vagrant']['user'] = 'buildbot'
 default['dmlb2000_pipeline']['libvirt']['users'] = %w(

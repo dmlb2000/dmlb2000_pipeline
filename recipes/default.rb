@@ -7,7 +7,6 @@
 include_recipe 'yum-centos'
 include_recipe 'yum-epel'
 include_recipe 'git'
-include_recipe 'dmlb2000_chef'
 
 package 'python-pip'
 package 'python-virtualenv'
@@ -15,6 +14,8 @@ package 'python-virtualenv'
 user 'buildbot' do
   home '/var/lib/buildbot'
 end
+
+include_recipe 'dmlb2000_chef'
 
 %w(
   /var/lib/buildbot/virtualenv

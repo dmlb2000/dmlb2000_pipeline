@@ -12,3 +12,7 @@ default['dmlb2000_pipeline']['url'] = \
 default['dmlb2000_pipeline']['cookbooks'] = ['dmlb2000_pipeline']
 
 default['vagrant']['user'] = 'buildbot'
+default['dmlb2000_pipeline']['libvirt']['users'] = %w(
+  dmlb2000
+  buildbot
+)

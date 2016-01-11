@@ -49,3 +49,24 @@ EOH
     action [:enable, :start]
   end
 end
+
+package 'libvirt-daemon'
+package 'libvirt-client'
+package 'libvirt-daemon-lxc'
+package 'libvirt-daemon-kvm'
+
+service 'libvirtd' do
+  action [:enable, :start]
+end
+
+node['dmlb2000_pipeline']['libvirt']['users'].each do |user|
+  template "allow_#{user}" do
+    source 'libvirt-auth.erb'
+    path "/etc/polkit-1/localauthority/50-local.d/#{user}.pkla"
+    owner 'root'
+    group 'root'
+    mode '0644'
+    variables(user: user)
+    notifies :restart, 'service[libvirtd]'
+  end
+end

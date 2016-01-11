@@ -10,3 +10,5 @@ default['dmlb2000_pipeline']['url'] = \
   "http://#{node['ipaddress']}:#{node['dmlb2000_pipeline']['port']}/"
 
 default['dmlb2000_pipeline']['cookbooks'] = ['dmlb2000_pipeline']
+
+default['vagrant']['user'] = 'buildbot'

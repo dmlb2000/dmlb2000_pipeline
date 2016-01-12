@@ -70,7 +70,7 @@ c['schedulers'].append(schedulers.ForceScheduler(
 
 c['builders'] = []
 factory = util.BuildFactory()
-factory.addStep(steps.ShellCommand(command=["kitchen", "test"]))
+factory.addStep(steps.ShellCommand(command=["kitchen", "test"], workdir="/var/lib/buildbot/slave/kitchen/%s"%(util.Property("from_cookbook"))))
 c['builders'].append(
     util.BuilderConfig(name="kitchen",
       slavenames=["kitchen"],
@@ -90,7 +90,9 @@ c['builders'].append(
 
 factory = util.BuildFactory()
 factory.addStep(steps.Git(repourl="https://github.com/dmlb2000/<%= cookbook %>.git", mode='incremental'))
-factory.addStep(trigger.Trigger(schedulerNames=['kitchen'],waitForFinish=True))
+kitchen_step = steps.Trigger(schedulerNames=['kitchen'],waitForFinish=True)
+kitchen_step.createTriggerProperties({"from_cookbook": "<%= cookbook %>"})
+factory.addStep(kitchen_step)
 
 c['builders'].append(
     util.BuilderConfig(name="<%=cookbook %>_kitchen",

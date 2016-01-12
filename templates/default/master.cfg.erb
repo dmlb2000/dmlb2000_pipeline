@@ -36,7 +36,7 @@ c['protocols'] = {'pb': {'port': <%= node['dmlb2000_pipeline']['protocols']['por
 c['change_source'] = []
 <%- node['dmlb2000_pipeline']['cookbooks'].each do |cookbook| %>
 c['change_source'].append(changes.GitPoller(
-        "http://github.com/dmlb2000/<%= cookbook %>.git",
+        "https://github.com/dmlb2000/<%= cookbook %>.git",
         workdir='gitpoller-workdir-<%= cookbook %>', branch='master',
         project='<%= cookbook %>',
         pollinterval=60))
@@ -47,7 +47,7 @@ c['change_source'].append(changes.GitPoller(
 # Configure the Schedulers, which decide how to react to incoming changes.  In this
 # case, just kick off a 'runtests' build
 
-c['schedulers'] = []
+c['schedulers'] = [schedulers.Triggerable(name='kitchen', builderNames=['kitchen'])]
 builderNames = []
 builderNames += <%= node['dmlb2000_pipeline']['cookbooks'].collect{|x| x+"_quick"}.to_s %>
 builderNames += <%= node['dmlb2000_pipeline']['cookbooks'].collect{|x| x+"_kitchen"}.to_s %>
@@ -69,6 +69,13 @@ c['schedulers'].append(schedulers.ForceScheduler(
 # only take place on one slave.
 
 c['builders'] = []
+factory = util.BuildFactory()
+factory.addStep(steps.ShellCommand(command=["kitchen", "test"]))
+c['builders'].append(
+    util.BuilderConfig(name="kitchen",
+      slavenames=["kitchen"],
+      factory=factory))
+
 <%- node['dmlb2000_pipeline']['cookbooks'].each do |cookbook| %>
 factory = util.BuildFactory()
 
@@ -83,13 +90,14 @@ c['builders'].append(
 
 factory = util.BuildFactory()
 factory.addStep(steps.Git(repourl="https://github.com/dmlb2000/<%= cookbook %>.git", mode='incremental'))
-factory.addStep(steps.ShellCommand(command=["kitchen", "test"]))
+factory.addStep(trigger.Trigger(schedulerNames=['kitchen'],waitForFinish=True))
 
 c['builders'].append(
     util.BuilderConfig(name="<%=cookbook %>_kitchen",
       slavenames=["kitchen"],
       factory=factory))
 <%- end %>
+
 
 ####### STATUS TARGETS
 

@@ -37,7 +37,7 @@ c['change_source'] = []
 <%- node['dmlb2000_pipeline']['cookbooks'].each do |cookbook| %>
 c['change_source'].append(changes.GitPoller(
         "http://github.com/dmlb2000/<%= cookbook %>.git",
-        workdir='gitpoller-workdir', branch='master',
+        workdir='gitpoller-workdir-<%= cookbook %>', branch='master',
         pollinterval=60))
 <%- end %>
 

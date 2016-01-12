@@ -69,7 +69,7 @@ c['builders'] = []
 <%- node['dmlb2000_pipeline']['cookbooks'].each do |cookbook| %>
 factory = util.BuildFactory()
 
-factory.addStep(steps.Git(repourl="http://github.com/dmlb2000/<%=cookbook %>.git", mode='incremental'))
+factory.addStep(steps.Git(repourl="https://github.com/dmlb2000/<%=cookbook %>.git", mode='incremental'))
 factory.addStep(steps.ShellCommand(command=["rubocop", "."]))
 factory.addStep(steps.ShellCommand(command=["foodcritic", ".", "-f", "correctness"]))
 
@@ -79,7 +79,7 @@ c['builders'].append(
       factory=factory))
 
 factory = util.BuildFactory()
-factory.addStep(steps.Git(repourl="http://github.com/dmlb2000/<%= cookbook %>.git", mode='incremental'))
+factory.addStep(steps.Git(repourl="https://github.com/dmlb2000/<%= cookbook %>.git", mode='incremental'))
 factory.addStep(steps.ShellCommand(command=["kitchen", "test"]))
 
 c['builders'].append(

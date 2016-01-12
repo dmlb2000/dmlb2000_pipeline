@@ -38,6 +38,7 @@ c['change_source'] = []
 c['change_source'].append(changes.GitPoller(
         "http://github.com/dmlb2000/<%= cookbook %>.git",
         workdir='gitpoller-workdir-<%= cookbook %>', branch='master',
+        project='<%= cookbook %>',
         pollinterval=60))
 <%- end %>
 
@@ -46,15 +47,17 @@ c['change_source'].append(changes.GitPoller(
 # Configure the Schedulers, which decide how to react to incoming changes.  In this
 # case, just kick off a 'runtests' build
 
+c['schedulers'] = []
 builderNames = []
 builderNames += <%= node['dmlb2000_pipeline']['cookbooks'].collect{|x| x+"_quick"}.to_s %>
 builderNames += <%= node['dmlb2000_pipeline']['cookbooks'].collect{|x| x+"_kitchen"}.to_s %>
-c['schedulers'] = []
+<%- node['dmlb2000_pipeline']['cookbooks'].each do |cookbook|%>
 c['schedulers'].append(schedulers.SingleBranchScheduler(
-                            name="all",
-                            change_filter=util.ChangeFilter(branch='master'),
+                            name='<%= cookbook %>',
+                            change_filter=util.ChangeFilter(project='<%= cookbook %>'),
                             treeStableTimer=None,
-                            builderNames=builderNames))
+                            builderNames=['<%= cookbook %>_quick', '<%= cookbook %>_kitchen']))
+<%- end %>
 c['schedulers'].append(schedulers.ForceScheduler(
                             name="force",
                             builderNames=builderNames))

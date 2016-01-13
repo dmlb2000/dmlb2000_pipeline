@@ -41,6 +41,6 @@ service 'buildbot' do
   action [:enable, :start]
 end
 
-file "/var/lib/buildbot/kitchen_run.sh" do
-  mode "0755"
+file '/var/lib/buildbot/kitchen_run.sh' do
+  mode '0755'
 end

@@ -50,13 +50,12 @@ c['change_source'].append(changes.GitPoller(
 c['schedulers'] = [schedulers.Triggerable(name='kitchen', builderNames=['kitchen'])]
 builderNames = []
 builderNames += <%= node['dmlb2000_pipeline']['cookbooks'].collect{|x| x+"_quick"}.to_s %>
-builderNames += <%= node['dmlb2000_pipeline']['cookbooks'].collect{|x| x+"_kitchen"}.to_s %>
 <%- node['dmlb2000_pipeline']['cookbooks'].each do |cookbook|%>
 c['schedulers'].append(schedulers.SingleBranchScheduler(
                             name='<%= cookbook %>',
                             change_filter=util.ChangeFilter(project='<%= cookbook %>'),
                             treeStableTimer=None,
-                            builderNames=['<%= cookbook %>_quick', '<%= cookbook %>_kitchen']))
+                            builderNames=['<%= cookbook %>_quick']))
 <%- end %>
 c['schedulers'].append(schedulers.ForceScheduler(
                             name="force",
@@ -82,19 +81,11 @@ factory = util.BuildFactory()
 factory.addStep(steps.Git(repourl="https://github.com/dmlb2000/<%=cookbook %>.git", mode='incremental'))
 factory.addStep(steps.ShellCommand(command=["rubocop", "."]))
 factory.addStep(steps.ShellCommand(command=["foodcritic", ".", "-f", "correctness"]))
+factory.addStep(steps.Trigger(schedulerNames=['kitchen'],waitForFinish=True, set_properties={"from_cookbook": "<%= cookbook %>"}))
 
 c['builders'].append(
     util.BuilderConfig(name="<%= cookbook %>_quick",
       slavenames=["quick"],
-      factory=factory))
-
-factory = util.BuildFactory()
-factory.addStep(steps.Git(repourl="https://github.com/dmlb2000/<%= cookbook %>.git", mode='incremental'))
-factory.addStep(steps.Trigger(schedulerNames=['kitchen'],waitForFinish=True, set_properties={"from_cookbook": "<%= cookbook %>"}))
-
-c['builders'].append(
-    util.BuilderConfig(name="<%=cookbook %>_kitchen",
-      slavenames=["kitchen"],
       factory=factory))
 <%- end %>
 

@@ -8,6 +8,7 @@ if ! test -d ${FROM_COOKBOOK} ; then
   popd
 fi
 pushd ${FROM_COOKBOOK}
+git fetch --all
 git checkout ${REVISION}
 kitchen test
 popd

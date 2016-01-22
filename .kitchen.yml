@@ -16,4 +16,5 @@ suites:
     run_list:
       - recipe[dmlb2000_pipeline::master]
       - recipe[dmlb2000_pipeline::slave]
+      - recipe[dmlb2000_pipeline::gerrit]
     attributes:

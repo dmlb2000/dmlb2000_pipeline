@@ -10,5 +10,11 @@ fi
 pushd ${FROM_COOKBOOK}
 git fetch --all
 git checkout ${REVISION}
-kitchen test
+if ! kitchen test ; then
+  kitchen destroy
+  rc=-1
+else
+  rc=0
+fi
 popd
+exit $rc

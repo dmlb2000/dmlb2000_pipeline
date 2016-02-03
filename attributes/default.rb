@@ -22,28 +22,3 @@ default['dmlb2000_pipeline']['libvirt']['users'] = %w(
   dmlb2000
   buildbot
 )
-
-default['java']['jdk_version'] = '8'
-default['gerrit']['home'] = '/var/lib/gerrit'
-default['gerrit']['user'] = 'root'
-default['gerrit']['gerrit_args'] = 'daemon'
-default['gerrit']['config']['gerrit']['basePath'] = 'git'
-default['gerrit']['config']['gerrit']\
-       ['canonicalWebUrl'] = "http://#{node['ipaddress']}:8000/"
-default['gerrit']['config']['database']['type'] = 'mysql'
-default['gerrit']['config']['database']['hostname'] = 'localhost'
-default['gerrit']['config']['database']['database'] = 'gerrit'
-default['gerrit']['config']['database']['username'] = 'gerrit'
-default['gerrit']['config']['index']['type'] = 'LUCENE'
-default['gerrit']['config']['auth']['type'] = 'OPENID'
-default['gerrit']['config']['sendemail']['smtpServer'] = 'localhost'
-default['gerrit']['config']['container']['user'] = 'root'
-default['gerrit']['config']['container']\
-       ['javaHome'] = node['java']['java_home']
-default['gerrit']['config']['sshd']['listenAddress'] = '*:29418'
-default['gerrit']['config']['httpd']['listenUrl'] = 'http://*:8000/'
-default['gerrit']['config']['cache']['directory'] = 'cache'
-default['gerrit']['config']['database']['type'] = 'mysql'
-default['gerrit']['config']['database']['database'] = 'gerrit'
-default['gerrit']['config']['database']['username'] = 'gerrit'
-default['gerrit']['config']['database']['hostname'] = 'localhost'

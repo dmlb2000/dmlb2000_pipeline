@@ -1,6 +1,0 @@
-<%- @data.keys.each do |section| %>
-[<%= section %>]
-<%- @data[section].keys.each do |key| %>
-	<%= key %> = <%= @data[section][key] %>
-<%- end %>
-<%- end %>

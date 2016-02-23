@@ -13,6 +13,7 @@ default['dmlb2000_pipeline']['url'] = \
 default['dmlb2000_pipeline']['cookbooks'] = %w(
   dmlb2000_pipeline
   dmlb2000_chef
+  dmlb2000_chefdk
   dmlb2000_distro
   dmlb2000_users
   dmlb2000_server

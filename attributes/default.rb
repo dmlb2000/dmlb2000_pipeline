@@ -18,6 +18,7 @@ default['dmlb2000_pipeline']['cookbooks'] = %w(
   dmlb2000_users
   dmlb2000_server
   dmlb2000_desktop
+  dmlb2000_docker
 )
 
 default['vagrant']['user'] = 'buildbot'

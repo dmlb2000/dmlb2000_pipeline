@@ -79,8 +79,8 @@ c['builders'].append(
 factory = util.BuildFactory()
 
 factory.addStep(steps.Git(repourl="https://github.com/dmlb2000/<%=cookbook %>.git", mode='incremental'))
-factory.addStep(steps.ShellCommand(command=["rubocop", "."]))
-factory.addStep(steps.ShellCommand(command=["foodcritic", ".", "-f", "correctness"]))
+factory.addStep(steps.ShellCommand(command=["/opt/chefdk/embedded/bin/rubocop", "."]))
+factory.addStep(steps.ShellCommand(command=["/opt/chefdk/embedded/bin/foodcritic", ".", "-f", "correctness"]))
 factory.addStep(steps.Trigger(schedulerNames=['kitchen'],waitForFinish=True, set_properties={"from_cookbook": "<%= cookbook %>"}))
 
 c['builders'].append(

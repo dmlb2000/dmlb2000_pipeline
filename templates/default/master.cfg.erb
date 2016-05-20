@@ -69,7 +69,7 @@ c['schedulers'].append(schedulers.ForceScheduler(
 
 c['builders'] = []
 factory = util.BuildFactory()
-factory.addStep(steps.ShellCommand(command=["/bin/bash", "-xe", "/var/lib/buildbot/kitchen_run.sh"], env={"FROM_COOKBOOK": util.Interpolate('%(prop:from_cookbook)s'), "REVISION": util.Interpolate('%(prop:got_revision:-%(src::revision:-unknown)s)s')}))
+factory.addStep(steps.ShellCommand(command=["/bin/bash", "-xe", "/var/lib/buildbot/kitchen_run.sh"], env={"FROM_COOKBOOK": util.Interpolate('%(prop:from_cookbook)s'), "REVISION": util.Interpolate('%(prop:got_revision:-%(src::revision:-unknown)s)s')}, timeout=3600))
 c['builders'].append(
     util.BuilderConfig(name="kitchen",
       slavenames=["kitchen"],

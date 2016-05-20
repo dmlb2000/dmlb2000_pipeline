@@ -2,8 +2,6 @@
 driver:
   name: vagrant
   provider: libvirt
-  customize:
-    volume_cache: "\'writeback\'"
 
 provisioner:
   name: chef_solo

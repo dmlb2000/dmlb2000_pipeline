@@ -57,6 +57,11 @@ c['schedulers'].append(schedulers.SingleBranchScheduler(
                             treeStableTimer=None,
                             builderNames=['<%= cookbook %>_quick']))
 <%- end %>
+c['schedulers'].append(schedulers.SingleBranchScheduler(
+                            name='packer',
+                            change_filter=util.ChangeFilter(project='packer'),
+                            treeStableTimer=None,
+                            builderNames=['packer_quick']))
 c['schedulers'].append(schedulers.ForceScheduler(
                             name="force",
                             builderNames=builderNames))

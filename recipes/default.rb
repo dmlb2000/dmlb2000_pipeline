@@ -7,6 +7,8 @@
 include_recipe 'yum-centos'
 include_recipe 'yum-epel'
 include_recipe 'git'
+include_recipe 'packer'
+include_recipe 'chef-dk'
 
 package 'python-pip'
 package 'python-virtualenv'
@@ -21,11 +23,16 @@ include_recipe 'dmlb2000_chef'
   /var/lib/buildbot/virtualenv
   /var/lib/buildbot/master
   /var/lib/buildbot/slave
+  /var/lib/buildbot/bin
 ).each do |buildbot_dir|
   directory buildbot_dir do
     owner 'buildbot'
     group 'buildbot'
   end
+end
+
+link '/var/lib/buildbot/bin/ruby' do
+  to '/opt/chefdk/embedded/bin/ruby'
 end
 
 python_virtualenv '/var/lib/buildbot/virtualenv' do

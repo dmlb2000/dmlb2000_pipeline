@@ -88,6 +88,13 @@ c['builders'].append(
       slavenames=["quick"],
       factory=factory))
 <%- end %>
+factory = util.BuildFactory()
+factory.addStep(steps.Git(repourl="https://github.com/chef/bento.git", mode='incremental'))
+factory.addStep(steps.ShellCommand(command=["./bin/bento", "build", "-o", "qemu", "-H", "centos-7.2-x86_64"], env={'PATH': '/usr/local/packer:/var/lib/buildbot/bin:/sbin:/bin:/usr/sbin:/usr/bin'}))
+c['builders'].append(
+    util.BuilderConfig(name="packer_quick",
+      slavenames=["kitchen"],
+      factory=factory))
 
 
 ####### STATUS TARGETS
